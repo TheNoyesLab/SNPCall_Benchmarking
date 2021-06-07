@@ -1,0 +1,38 @@
+name: BEARpy
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - perl-app-cpanminus=1.7044=pl526_1
+  - biopython=1.76=py27h516909a_0
+  - certifi=2019.11.28=py27h8c360ce_1
+  - python_abi=2.7=1_cp27mu
+  - _libgcc_mutex=0.1=main
+  - blas=1.0=mkl
+  - intel-openmp=2020.2=254
+  - libedit=3.1.20191231=h14c3975_1
+  - libgcc-ng=9.1.0=hdf63c60_0
+  - libgfortran-ng=7.3.0=hdf63c60_0
+  - libstdcxx-ng=9.1.0=hdf63c60_0
+  - mkl=2020.2=256
+  - mkl-service=2.3.0=py27he904b0f_0
+  - mkl_fft=1.0.15=py27ha843d7b_0
+  - mkl_random=1.1.0=py27hd6b4f25_0
+  - ncurses=6.2=he6710b0_1
+  - numpy=1.16.6=py27hbc911f0_0
+  - numpy-base=1.16.6=py27hde5b4d6_0
+  - openssl=1.0.1k=1
+  - perl=5.26.2=h14c3975_0
+  - pip=19.3.1=py27_0
+  - python=2.7.3=7
+  - readline=6.2=2
+  - setuptools=44.0.0=py27_0
+  - six=1.15.0=py_0
+  - sqlite=3.33.0=h62c20be_0
+  - system=5.8=2
+  - tk=8.5.18=0
+  - wheel=0.35.1=pyhd3eb1b0_0
+  - zlib=1.2.11=h7b6447c_3
+prefix: /home/noyes046/elder099/.conda/envs/BEARpy
+
