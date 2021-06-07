@@ -1,2 +1,0 @@
-AME1.R1.fastq
-AME1.R2.fastq
