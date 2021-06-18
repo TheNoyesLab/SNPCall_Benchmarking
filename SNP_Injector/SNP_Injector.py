@@ -11,13 +11,57 @@ from Bio import SeqIO  #requires biopython
 
 
 
-def random_snp(read_len):
-    p=0.01   #1 percent of SNPs on average
-    num= numpy.random.binomial(read_len,p,1)   #output number of snps based on binomial distribution
+#####Original nuc -> New, Different Nuc
+def only_snp(old_nt,tot_snp):
+    ###Choose new nucleotide != old nucleotide
+    newnt=[]   #empty list of new nucleotides
+    it=0       #iterator starts at 0
 
-    return(num)
+    while it < tot_snp:   #loop through only as many as total # of snps
+        ntlist=['A','C','T','G']   #full list of nt's
 
 
+        newlist=[nuc for nuc in ntlist if nuc not in old_nt[it]] #list on only possible new nt's
+
+        onent=numpy.random.choice(newlist,1)                    #pick random nuc's to replace old
+        #print("New SNP",onent[0])
+        newnt.append(onent[0])                                  #add to list of new nucleotides (SNPs)
+        it=it+1                                                 #increase iterator
+
+    print("New SNPs:",newnt)
+    return(newnt)
+
+
+#####Main SNP RNG function
+def random_snp(old_sequence,read_len):
+
+    p=0.01   #1 percent of nt's are SNPs on average
+    #Binomially distributed SNPs
+    SnpTot= numpy.random.binomial(read_len,p,1)   #output number of snps to inject
+    #print("Total SNPs",SnpTot)
+    Ntindex=numpy.random.choice(range(read_len),SnpTot,replace=False)   #pick random nucleotides to replace (number to replace is binomially distributed)
+    print("\n","Index of Snps:",Ntindex)
+
+    print(old_sequence) #print the sequence, it's pretty
+
+    oldnt=[old_sequence[i] for i in Ntindex]   #The old nucleotides at the locus of SNPs
+    print("Old_nt:",oldnt)
+
+
+    newnt=only_snp(oldnt,SnpTot)     #Inputs old nucs, outputs new SNPs
+
+
+    Snpswap = {Ntindex[i]: newnt[i] for i in range(len(Ntindex))}     #Create a dictionary of index -> SNP
+    print("Snpswap Dictionary:",str(Snpswap))
+
+    return
+
+
+
+
+#####
+#####MAIN SECTION
+#####
 
 if __name__ == '__main__':
     n=0 #Number of records to go through
@@ -27,71 +71,9 @@ if __name__ == '__main__':
         n=n+1
         Oldseq=str(record.seq)
         readlength=len(Oldseq)  #length of each record's read
-        SnpTot=random_snp(readlength)    #how many snps to inject
         #print(SnpTot)
-        print(Oldseq)
-        Ntindex=numpy.random.choice(range(readlength),SnpTot,replace=False)   #pick random nucleotides to replace (number to replace is binomially distributed)
 
-        oldnt=[Oldseq[i] for i in Ntindex]
-        print("Old_nt:",oldnt)
-        newnt=numpy.random.choice(('A','C','T','G'),SnpTot)   #pick random nuc's
-        print("Index of Snps:",Ntindex)
-        print("New_nt:",newnt)
-        Snpswap = {Ntindex[i]: newnt[i] for i in range(len(Ntindex))}
-        print("Snpswap Dictionary:",str(Snpswap))
+        random_snp(Oldseq,readlength)    #Generate a random SNP
 
-        #Midseq=
-
-        if n>=10:
+        if n>=10:      #Only the first 10 entries
             break
-#     ###Parsing command line prompts###
-# def parse_cmdline_params(cmdline_params):
-#     info = "Removes duplicate FASTQ entries from a FASTQ file"
-#     parser = argparse.ArgumentParser(description=info)
-#     parser.add_argument('-i', '--input_files', nargs='+', required=True,
-#                             help='Use globstar to pass a list of sequence files, (Ex: *.fastq.gz)')
-#     return parser.parse_args(cmdline_params)
-#     ###Parsing command line prompts###
-#
-#
-#
-# def multi_func(q):  #Collect Q information  #Function to run in parallel
-#     nucLen = len(q) - 1	    #The length of the sequence; exclude new line character
-#
-#     Q_scores = [ord(q[i]) - 33 for i in range(nucLen)]   #Translate to numbers and subtract 33
-#     Prob = (10 ** (-Q_scores[i] / 10) for i in range(nucLen))   #Convert Q to Probabilities
-#
-#     #Extract the mean Q and P and Read Length for each Read
-#     return sum(Q_scores) / nucLen, sum(Prob) / nucLen, nucLen
-#
-#
-#
-# #Extract Quality Scores and other sequence information
-# def Pull_Phred(fastq_files):
-#     for f in fastq_files: # iterate through each fastq file
-#         fp = open(f, 'r')
-#
-#         Lines = fp.readlines()
-#         Line4 = Lines[3::4] #Every 4th line (Quality scores) starting with line 4 (index 3)
-#         readnum=len(Line4) #number of reads in file
-#
-#
-#
-#
-#         qs = (listy[0] for listy in res) #Extract Q's as 1st element
-#         ps = (listy[1] for listy in res) #Extract P's as 2nd element
-#         readlen = (listy[2] for listy in res) #Extract read length as 3rd element
-#
-#         print("\n Number of Reads = ", readnum)
-#         print("Mean Quality Score = ",sum(qs) / readnum)
-#         print("Mean Probability of Error = ",sum(ps) / readnum)
-#         print("Mean readlength = ", sum(readlen) / readnum)
-#
-#     fp.close()
-#
-#
-# if __name__ == '__main__':
-#     opts = parse_cmdline_params(sys.argv[1:])
-#     fastq_files = opts.input_files  #parse input files
-#
-#     Pull_Phred(fastq_files) #run Phred collection
