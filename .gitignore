@@ -1,3 +1,4 @@
 DiscoSNP_output/*.txt
 DiscoSNP_output/*.fa
 DiscoSNP_output/*.h5
+SNP_Injector/*.fastq
