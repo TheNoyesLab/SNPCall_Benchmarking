@@ -1,0 +1,25 @@
+##fileformat=VCFv4.1
+##filedate=2021617
+##source=VCF_creator
+##SAMPLE=file://Mixed_Nova_short_k_31_c_3_D_100_P_3_b_0_coherentBWA_MEM.sam
+##REF=<ID=REF,Number=1,Type=String,Description="Allele of the path Disco aligned with the least mismatches">
+##FILTER=<ID=MULTIPLE,Description="Mapping type : PASS or MULTIPLE or .">
+##INFO=<ID=Ty,Number=1,Type=String,Description="SNP, INS, DEL or .">
+##INFO=<ID=Rk,Number=1,Type=Float,Description="SNP rank">
+##INFO=<ID=UL,Number=1,Type=Integer,Description="length of the unitig left">
+##INFO=<ID=UR,Number=1,Type=Integer,Description="length of the unitig right">
+##INFO=<ID=CL,Number=1,Type=Integer,Description="length of the contig left">
+##INFO=<ID=CR,Number=1,Type=Integer,Description="length of the contig right">
+##INFO=<ID=Genome,Number=1,Type=String,Description="Allele of the reference;for indel reference is . ">
+##INFO=<ID=Sd,Number=1,Type=Integer,Description="Reverse (-1) or Forward (1) Alignement">
+##INFO=<ID=XA,Number=.,Type=String,Description="Other mapping positions (chromosome_position). Position is negative in case of Reverse alignment. The position designs the starting position of the alignment, not the position of the variant itself.">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Cumulated depth accross samples (sum)">
+##FORMAT=<ID=PL,Number=G,Type=Integer,Description="Phred-scaled Genotype Likelihoods">
+##FORMAT=<ID=AD,Number=2,Type=Integer,Description="Depth of each allele by sample">
+##FORMAT=<ID=HQ,Number=2,Type=Integer,Description="Haplotype Quality">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	G1	G2
+MEG_3992|Drugs|MLS|Macrolide-resistant_23S_rRNA_mutation|MLS23S|RequiresSNPConfirmation	1979	15_3	T	C	.	MULTIPLE	Ty=SNP;Rk=0.028865;UL=4;UR=58;CL=53;CR=58;Genome=.;Sd=-1;XA=MEG_1986,MEG_1987	GT:DP:PL:AD:HQ	1|1:163:2848,318,74:12,151:70,69	1|1:152:2725,322,51:9,143:68,67
+MEG_3992|Drugs|MLS|Macrolide-resistant_23S_rRNA_mutation|MLS23S|RequiresSNPConfirmation	1982	15_2	T	C	.	MULTIPLE	Ty=SNP;Rk=0.028865;UL=4;UR=58;CL=53;CR=58;Genome=.;Sd=-1;XA=MEG_1986,MEG_1987	GT:DP:PL:AD:HQ	1|1:163:2848,318,74:12,151:70,69	1|1:152:2725,322,51:9,143:68,67
+MEG_3992|Drugs|MLS|Macrolide-resistant_23S_rRNA_mutation|MLS23S|RequiresSNPConfirmation	1986	15_1	T	C	.	MULTIPLE	Ty=SNP;Rk=0.028865;UL=4;UR=58;CL=53;CR=58;Genome=.;Sd=-1;XA=MEG_1986,MEG_1987	GT:DP:PL:AD:HQ	1|1:163:2848,318,74:12,151:70,69	1|1:152:2725,322,51:9,143:68,67
+MEG_3992|Drugs|MLS|Macrolide-resistant_23S_rRNA_mutation|MLS23S|RequiresSNPConfirmation	2574	52	C	T	.	MULTIPLE	Ty=SNP;Rk=0.063487;UL=27;UR=15;CL=134;CR=15;Genome=C;Sd=1;XA=MEG_2576,MEG_316,MEG_2574,MEG_310,MEG_2815,MEG_325	GT:DP:PL:AD:HQ	1/1:148:2553,278,79:12,136:67,69	1/1:126:2035,193,119:15,111:69,68
