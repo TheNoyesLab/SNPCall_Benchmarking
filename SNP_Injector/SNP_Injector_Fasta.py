@@ -60,7 +60,7 @@ def random_snp(old_sequence,ref_len):
 
         #print("Mutation:",old_sequence[index],"--->",mut_old_sequence[index])
 
-
+    Ntindex= [x + 1 for x in Ntindex]
     SnpIndex_dic = { Ntindex[i]: (str(oldnt[i]),newnt[i]) for i in range(len(Ntindex)) }     #Create a dictionary of index -> SNP
     SNPIndex=pd.DataFrame.from_dict(data=SnpIndex_dic,orient='index',columns=['Old_Nuc','New_SNP']) #Turn into a DataFrame
     SNPIndex.reset_index(inplace=True)
