@@ -1,3 +1,4 @@
+.DS_Store
 DiscoSNP_output/*.txt
 DiscoSNP_output/*.fa
 DiscoSNP_output/*.h5
