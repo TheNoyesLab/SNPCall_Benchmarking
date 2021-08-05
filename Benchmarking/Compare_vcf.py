@@ -22,13 +22,14 @@ def read_vcf(path):
 GATK=read_vcf('/Users/Gawdcomplex/Desktop/NoyesLab/GATKOut_Jesse.vcf')
 LoFreq=read_vcf('/Users/Gawdcomplex/Desktop/NoyesLab/FreqOut.vcf')
 Log=pd.read_csv('/Users/Gawdcomplex/Desktop/NoyesLab/SNPLog.csv')
+Meta=pd.read_csv('/Users/Gawdcomplex/Desktop/NoyesLab/Meta_Out_Fix.vcf',sep="\t",names=["CHROM","DASH","POS","REF","QUAL","ALT"])
 ###Remove excess clutter from vcfs
 GATK=GATK.iloc[:,[0,1,3,4]]
 LoFreq=LoFreq.iloc[:,[0,1,3,4]]
 
 #GATK=read_vcf('/Users/Gawdcomplex/Desktop/NoyesLab/GATKOut_Jesse_copy.vcf')  #Edited GATK file for testing
 
-
+print(Meta)
 
 #################BELOW THEE LIES THE BENCHMARKS
 
@@ -63,3 +64,5 @@ print("GATK-HC")
 Bench(Log,GATK)
 print("LoFreq")
 Bench(Log,LoFreq)
+print("MetaSNV")
+Bench(Log,Meta)
