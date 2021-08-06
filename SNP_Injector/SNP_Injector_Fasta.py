@@ -29,44 +29,50 @@ def only_snp(old_nt,tot_snp):
     return(newnt)
 
 
+##############################
 #####Main SNP RNG function
-def random_snp(old_sequence,ref_len):
+##############################
+def random_snp(record):
 
-    p=0.0001   #1 percent of nt's are SNPs on average
-    #Binomially distributed SNPs
-    SnpTot= numpy.random.binomial(ref_len,p,1)   #output number of snps to inject (number to replace is binomially distributed)
+    ##Preparing SeqIO record data
+    old_sequence=record.seq
+    Desc=record.id
+    ref_len=len(old_sequence)  #length of each record's reference
+
+    ##Creating #Binomially distributed SNPs
+    p=0.0001                                                           #1 percent of nt's are SNPs on average
+    SnpTot= numpy.random.binomial(ref_len,p,1)                         #output number of snps to inject (number to replace is binomially distributed)
     print("Total SNPs",SnpTot)
     Ntindex=numpy.random.choice(range(ref_len),SnpTot,replace=False)   #pick random nucleotides at index to replace
-    Ntindex.sort()    #Ascending order
-    print("\n","Index of Snps:",Ntindex)
+    Ntindex.sort()                                                     #Ascending order
+
 
     print(old_sequence[1:20]) #print the sequence, it's pretty
 
     oldnt=[old_sequence[i] for i in Ntindex]   #The old nucleotides at the locus of SNPs
-
-
-    newnt=only_snp(oldnt,SnpTot)     #Inputs old nucs, outputs new SNPs
-
-    mut_old_sequence=old_sequence.tomutable()  #Make sequence mutable so I can edit
-
+    newnt=only_snp(oldnt,SnpTot)               #Inputs old nucs, outputs new SNPs
 
 
     ###Loop through old sequence and mutate it
+    mut_old_sequence=old_sequence.tomutable()  #Make sequence mutable so I can edit
     nucnum=0  #iterator for newnt list
     for index in Ntindex:
-
         mut_old_sequence[int(index)]=newnt[nucnum]        #mutate old sequence at index from list of new nucleotides
-        nucnum=nucnum+1         #iterate through list of new nucleotides
+        nucnum=nucnum+1                                   #iterate through list of new nucleotides
 
-        #print("Mutation:",old_sequence[index],"--->",mut_old_sequence[index])
+
 
     Ntindex= [x + 1 for x in Ntindex]
     SnpIndex_dic = { Ntindex[i]: (str(oldnt[i]),newnt[i]) for i in range(len(Ntindex)) }     #Create a dictionary of index -> SNP
-    SNPIndex=pd.DataFrame.from_dict(data=SnpIndex_dic,orient='index',columns=['Old_Nuc','New_SNP']) #Turn into a DataFrame
-    SNPIndex.reset_index(inplace=True)
-    SNPIndex=SNPIndex.rename(columns = {'index' : 'Reference_Location'})
+    SNPIndex=pd.DataFrame.from_dict(data=SnpIndex_dic,orient='index',columns=['REF','ALT']) #Turn into a DataFrame
 
-    return mut_old_sequence, SNPIndex
+    SNPIndex.reset_index(inplace=True)
+    SNPIndex=SNPIndex.rename(columns = {'index' : 'POS'})      #Edit Index column
+
+    SNPIndex["CHROM"]=Desc                                     #Add genome description column
+    SNPIndex=SNPIndex[['CHROM','POS','REF','ALT']]             #Reorder columns
+
+    return Desc, mut_old_sequence, SNPIndex
 
 
 
@@ -76,22 +82,23 @@ def random_snp(old_sequence,ref_len):
 #####
 
 if __name__ == '__main__':
-    for record in SeqIO.parse("Ecoli_Ref.fasta","fasta"):
+    file=open("/Users/Gawdcomplex/Desktop/NoyesLab/SNPReference.fasta","w")
+    SNPLog=pd.DataFrame()
+    for record in SeqIO.parse("/Users/Gawdcomplex/Desktop/NoyesLab/CAT.fasta","fasta"):
         #print(record.seq,record.letter_annotations["phred_quality"])
+        print(record.id)
+        # Oldseq=record.seq
+        # Desc=record.description
+        # reflength=len(Oldseq)  #length of each record's reference
 
-        Oldseq=record.seq
-        Desc=record.description
-        reflength=len(Oldseq)  #length of each record's reference
+
+        Desc, New_mut_sequence, SNPDataFrame=random_snp(record)    #Generate a random SNP
 
 
-        New_mut_sequence, SNPDataFrame=random_snp(Oldseq,reflength)    #Generate a random SNP
 
-        ###Check that these do in fact replace the old nukes
-        #print(Oldseq[next(iter(Snpswap_dic.keys()))-4:next(iter(Snpswap_dic.keys()))+6])
-        #print(New_mut_sequence[next(iter(Snpswap_dic.keys()))-4:next(iter(Snpswap_dic.keys()))+6])
-
-        file=open("SNPReference.fasta","w")
         file.writelines([">",Desc,"\n",str(New_mut_sequence),"\n"])
-        file.close()
 
-        SNPDataFrame.to_csv('SNPLog.csv',index=False)
+        SNPLog=pd.concat([SNPLog,SNPDataFrame])
+
+    SNPLog.to_csv('/Users/Gawdcomplex/Desktop/NoyesLab/SNPLog.csv',index=False)
+    file.close()
