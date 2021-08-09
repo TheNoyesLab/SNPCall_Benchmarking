@@ -1,21 +1,12 @@
 #!/bin/bash
 
-#minimap2 -ax sr /home/noyes046/shared/databases/Jesse_database/Jesse_db_only_complete.fasta 100k_test_R1.fastq 100k_test_R2.fastq > TestAlignment.sam  #Create the alignment to megares
+#conda activate GATK
+bowtie2-build -f /home/noyes046/shared/databases/Jesse_database/Jesse_full_db.fasta GATK_Stuff/Multi_bowtie
 
-#Build a bowtie index
-bowtie2-build -f /home/noyes046/shared/databases/Jesse_database/Jesse_full_db.fasta \
-	/home/noyes046/shared/databases/Jesse_database/bowtie_db/Jesse_database_bowtie 
-bowtie2 --rg-id 100k_test --rg SM:AME1 --rg PL:Illumina \
-	-p 10 -x /home/noyes046/shared/databases/Jesse_database/bowtie_db/Jesse_database_bowtie \
-	-1 100k_test_R1.fastq -2 100k_test_R2.fastq -S TestAlignment.sam 
+bowtie2 --rg-id 100k_test --rg SM:Multi --rg PL:Illumina \
+        -p 10 -x GATK_Stuff/Multi_bowtie -1 Simmy_reads_R1.fastq -2 Simmy_reads_R2.fastq -S Bow_Multi_Out.sam
 
-
-samtools view -S -b TestAlignment.sam > TestAlignment.bam #Convert sam to bam
-samtools sort TestAlignment.bam -o TestAlign_sorted.bam #Sort bam file
-samtools view -h -o TestAlign_sorted.sam TestAlign_sorted.bam #make a sam again because
-
-#create bed file
-bedtools bamtobed -i TestAlign_sorted.bam > TestAlign_sorted.bed
-
-#create bai file
-samtools index TestAlign_sorted.bam
+samtools view -S -b Bow_Multi_Out.sam > Bow_Multi_Out.bam #Convert sam to bam
+samtools sort Bow_Multi_Out.bam -o Bow_Multi_sorted.bam #Sort bam file
+bedtools bamtobed -i Bow_Multi_sorted.bam > Bow_Multi_sorted.bed #Make a bed file
+samtools index Bow_Multi_sorted.bam
