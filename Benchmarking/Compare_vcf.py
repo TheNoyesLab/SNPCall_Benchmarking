@@ -20,9 +20,13 @@ def read_vcf(path):
 
 ###Read in all of the vcf-like files
 GATK=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/GATKOut_Jesse.vcf")
+GATKMulti=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/GATKMultiOut.vcf")
 LoFreq=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/FreqOut.vcf")
-Log=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/SNPLog.csv")
+LoFreqMulti=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/FreqMultiOut.vcf")
 Meta=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/Meta_Out_Fix.vcf",sep="\t",names=["CHROM","DASH","POS","REF","QUAL","ALT"])
+
+Log=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/SNPLog.csv")
+Log1=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/SNPLog1.csv")
 ###Remove excess clutter from vcfs
 GATK=GATK.iloc[:,[0,1,3,4]]
 LoFreq=LoFreq.iloc[:,[0,1,3,4]]
@@ -49,9 +53,9 @@ def Bench(Log,Calldf):
     Recall=TP/RealP     #True positives over # of Actual positives
     Fscore=2*(Precision*Recall)/(Precision+Recall)        #Harmonic Mean of Precision & Recall
 
-    print("TPLIST",TP)
-    print("FPLIST",FP)
-    print("FNLIST",FN)
+    print("True Positives:",TP)
+    print("False Positives:",FP)
+    print("False Negatives:",FN)
 
     print("Precision:",Precision)
     print("Recall:",Recall)
@@ -66,3 +70,7 @@ print("LoFreq")
 Bench(Log,LoFreq)
 print("MetaSNV")
 Bench(Log,Meta)
+print("GATKMulti")
+Bench(Log1,GATKMulti)
+print("LoFreqMulti")
+Bench(Log1,LoFreqMulti)
