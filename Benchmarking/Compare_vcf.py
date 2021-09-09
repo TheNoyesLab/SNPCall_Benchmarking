@@ -24,9 +24,13 @@ GATKMulti=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/GATKMultiOut.vcf")
 LoFreq=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/FreqOut.vcf")
 LoFreqMulti=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/FreqMultiOut.vcf")
 Meta=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/Meta_Out_Fix.vcf",sep="\t",names=["CHROM","DASH","POS","REF","QUAL","ALT"])
+Disco=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/Disco_Out.vcf")
+DubStrelka=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/Strelka_Double.vcf")
+DubFreq=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/FreqDoubleOut.vcf")
 
 Log=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/SNPLog.csv")
 Log1=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/SNPLog1.csv")
+DubLog=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/DoubleSNPLog.csv")
 ###Remove excess clutter from vcfs
 GATK=GATK.iloc[:,[0,1,3,4]]
 LoFreq=LoFreq.iloc[:,[0,1,3,4]]
@@ -51,7 +55,7 @@ def Bench(Log,Calldf):
     #Benchmarking Metrics
     Precision=TP/PredP  #True positives over # of predicted positives (the # of SNP Caller calls)
     Recall=TP/RealP     #True positives over # of Actual positives
-    Fscore=2*(Precision*Recall)/(Precision+Recall)        #Harmonic Mean of Precision & Recall
+    #Fscore=2*(Precision*Recall)/(Precision+Recall)        #Harmonic Mean of Precision & Recall
 
     print("True Positives:",TP)
     print("False Positives:",FP)
@@ -59,18 +63,27 @@ def Bench(Log,Calldf):
 
     print("Precision:",Precision)
     print("Recall:",Recall)
-    print("Harmonic Mean of Precision and Recall i.e. the F-score:",Fscore,"\n")
+    #print("Harmonic Mean of Precision and Recall i.e. the F-score:",Fscore,"\n")
 
 
 
 print("VARIANT CALLER BENCHMARKING","\n","\n")
 print("GATK-HC")
-Bench(Log,GATK)
+#Bench(Log,GATK)
 print("LoFreq")
-Bench(Log,LoFreq)
+#Bench(Log,LoFreq)
 print("MetaSNV")
-Bench(Log,Meta)
+#Bench(Log,Meta)
 print("GATKMulti")
 Bench(Log1,GATKMulti)
 print("LoFreqMulti")
 Bench(Log1,LoFreqMulti)
+
+print("DiscoSNP")
+Bench(DubLog,Disco)
+
+print("Strelka")
+Bench(DubLog,DubStrelka)
+
+print("LoFreq")
+Bench(DubLog,DubFreq)
