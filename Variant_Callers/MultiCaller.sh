@@ -65,6 +65,8 @@ configureStrelkaGermlineWorkflow.py --bam $bam_file  \
         --runDir $SimPath/M5/Strelka_Stuff
 
 python $SimPath/M5/Strelka_Stuff/runWorkflow.py -m local --quiet #-j 16
+mv $SimPath/M5/Strelka_Stuff/results/variants/variants.vcf.gz $SimPath/M5/Strelka_Out/
+gunzip $SimPath/M5/Strelka_Out/variants.vcf.gz
 
 
 
@@ -77,9 +79,22 @@ echo "Start BactSNP"
 conda activate bactsnp
 
 bactsnp -q $SimPath/FastqlistBact.txt \
-        -r  $reference
+        -r  $reference \
         -o $SimPath/M5/BactSNP_Stuff
 
 
+
+
+#####
+#####DO BENCHMARKING
+#####
+echo "Start Benchmarking"
+
+#Start env with biopython (like InSilicoSeq)
+conda activate InSilicoSeq
+
+
+python $SimPath/Workflows/Compare_vcf.py -i $SimPath/M5/Disco_Out/Disco_Out_k_31_c_3_D_100_P_3_b_0_coherent_for_IGV.vcf \
+	$SimPath/M5/Strelka_Out/variants.vcf $SimPath/M5/Freq_Out/FreqOut.vcf -G $SimPath/DoubleSNPLog.csv
 
 
