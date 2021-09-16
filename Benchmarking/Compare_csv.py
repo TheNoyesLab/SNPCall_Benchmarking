@@ -100,9 +100,9 @@ if __name__ == '__main__':
     meta_file = opts.input_meta #input metaSNV file
     gold_file = pd.read_csv(opts.gold_standard) #input known SNPs in csv
 
- 
-    bact_frame = pd.read_csv(bact_file,sep="\t",names=["CHROM","POS","REF","ALT"])
-    meta_frame = pd.read_csv(meta_file,sep="\t",names=["CHROM","DASH","POS","REF","QUAL","ALT"])
-
-    Bench(gold_file,bact_frame)
-    Bench(gold_file,meta_frame)
+    if bact_file is not None: 
+        bact_frame = pd.read_csv(bact_file,sep="\t",names=["CHROM","POS","REF","ALT"])
+        Bench(gold_file,bact_frame)
+    if meta_file is not None:
+        meta_frame = pd.read_csv(meta_file,sep="\t",names=["CHROM","DASH","POS","REF","QUAL","ALT"])
+        Bench(gold_file,meta_frame)
