@@ -1,5 +1,10 @@
 # Injecting SNPs
 
+##Using SNP\_Injector
+ - python SNP\_Injector\_Fasta.py -s 2 -r /home/noyes046/shared/projects/SNP\_Call\_Benchmarking/Simulated\_Datasets/Ecoli\_double\_ref.fasta
+ - **-s** indicates # of SNP'd copies (strains)  
+ - **-r** indicates a reference database to use (Default=Jesse\_full\_db.fasta)
+
 ## Scripts and files used in Injecting SNPs
  - **SNP_Injector_Fasta.py:** Inputs SNPs into original genome, outputs new genome with added SNPs (SNPReference.fasta)
    - conda activate snowflakes

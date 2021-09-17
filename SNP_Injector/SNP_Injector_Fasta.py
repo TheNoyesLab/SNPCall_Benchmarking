@@ -8,6 +8,20 @@ import numpy
 from Bio import SeqIO  #requires biopython
 
 
+###Parsing command line prompts###
+def parse_cmdline_params(cmdline_params):
+    info = "Input Number of Strains"
+    parser = argparse.ArgumentParser(description=info)
+    parser.add_argument('-s', '--strains', required=True,
+                        help='Input an integer number of genome copies')
+    parser.add_argument('-r', '--ref_db', required=False, default="/home/noyes046/shared/databases/Jesse_database/Jesse_full_db.fasta",
+                        help='Input filepath of a reference database')
+    return parser.parse_args(cmdline_params)
+###Parsing command line prompts###
+
+
+
+
 
 #####Original nuc -> New, Different Nuc
 def only_snp(old_nt,tot_snp):
@@ -82,11 +96,18 @@ def random_snp(record):
 #####
 
 if __name__ == '__main__':
-    file=open("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/Jesse_full_db_3strain_SNP.fasta","w")
+    opts = parse_cmdline_params(sys.argv[1:])
+    num_strains = opts.strains  #input number of strains
+    Ref = opts.ref_db           #input filepath of reference database
+
+    filename= "/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/Jesse_full_db_" + str(num_strains) + "strain_SNP.fasta"
+    file=open(filename,"w")
+
     SNPLog=pd.DataFrame()  #Empty DF to append SNP info to
 
-    for strain in range(3):
-        for record in SeqIO.parse("/home/noyes046/shared/databases/Jesse_database/Jesse_full_db_3strain.fasta","fasta"):
+    for strain in range(int(num_strains)):
+        print("Strain Number:",strain,"\n")
+        for record in SeqIO.parse(Ref,"fasta"):
             print(record.id)
             # Oldseq=record.seq
             # Desc=record.description
@@ -97,9 +118,10 @@ if __name__ == '__main__':
 
 
             #Write a new fasta with IDs of duplictes changed
-            file.writelines([">",Desc,".",strain,"\n",str(New_mut_sequence),"\n"]) #">E coli genome H815.1" \n sequence \n ">E coli genome H815.2" \n sequence etc
+            file.writelines([">",Desc,"_",str(strain+1),"\n",str(New_mut_sequence),"\n"]) #">E coli genome H815_1" \n sequence \n ">E coli genome H815_2" \n sequence etc
 
             SNPLog=pd.concat([SNPLog,SNPDataFrame])
-
-    SNPLog.to_csv('/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/Full3SNPLog.csv',index=False)
+    
+    SNPLog_file="/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/Full" + str(num_strains) + "SNPLog.csv"
+    SNPLog.to_csv(SNPLog_file,index=False)
     file.close()
