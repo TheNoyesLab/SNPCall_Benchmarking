@@ -82,9 +82,9 @@ def random_snp(record):
 #####
 
 if __name__ == '__main__':
-    file=open("/Users/Gawdcomplex/Desktop/NoyesLab/SNPReference.fasta","w")
+    file=open("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/DoubleSNPRef.fasta","w")
     SNPLog=pd.DataFrame()
-    for record in SeqIO.parse("/Users/Gawdcomplex/Desktop/NoyesLab/CAT.fasta","fasta"):
+    for record in SeqIO.parse("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/Ecoli_double_ref.fasta","fasta"):
         #print(record.seq,record.letter_annotations["phred_quality"])
         print(record.id)
         # Oldseq=record.seq
@@ -100,5 +100,5 @@ if __name__ == '__main__':
 
         SNPLog=pd.concat([SNPLog,SNPDataFrame])
 
-    SNPLog.to_csv('/Users/Gawdcomplex/Desktop/NoyesLab/SNPLog.csv',index=False)
+    SNPLog.to_csv('/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/DoubleSNPLog.csv',index=False)
     file.close()
