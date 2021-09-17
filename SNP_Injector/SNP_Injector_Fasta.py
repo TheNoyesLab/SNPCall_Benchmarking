@@ -84,23 +84,22 @@ def random_snp(record):
 if __name__ == '__main__':
     file=open("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/Jesse_full_db_3strain_SNP.fasta","w")
     SNPLog=pd.DataFrame()  #Empty DF to append SNP info to
-    
-    
-    for record in SeqIO.parse("/home/noyes046/shared/databases/Jesse_database/Jesse_full_db_3strain.fasta","fasta"):
-        #print(record.seq,record.letter_annotations["phred_quality"])
-        print(record.id)
-        # Oldseq=record.seq
-        # Desc=record.description
-        # reflength=len(Oldseq)  #length of each record's reference
+
+    for strain in range(3):
+        for record in SeqIO.parse("/home/noyes046/shared/databases/Jesse_database/Jesse_full_db_3strain.fasta","fasta"):
+            print(record.id)
+            # Oldseq=record.seq
+            # Desc=record.description
+            # reflength=len(Oldseq)  #length of each record's reference
 
 
-        Desc, New_mut_sequence, SNPDataFrame=random_snp(record)    #Generate a random SNP
+            Desc, New_mut_sequence, SNPDataFrame=random_snp(record)    #Generate a random SNP
 
 
+            #Write a new fasta with IDs of duplictes changed
+            file.writelines([">",Desc,".",strain,"\n",str(New_mut_sequence),"\n"]) #">E coli genome H815.1" \n sequence \n ">E coli genome H815.2" \n sequence etc
 
-        file.writelines([">",Desc,"\n",str(New_mut_sequence),"\n"])
-
-        SNPLog=pd.concat([SNPLog,SNPDataFrame])
+            SNPLog=pd.concat([SNPLog,SNPDataFrame])
 
     SNPLog.to_csv('/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/Full3SNPLog.csv',index=False)
     file.close()
