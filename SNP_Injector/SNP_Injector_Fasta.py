@@ -82,9 +82,11 @@ def random_snp(record):
 #####
 
 if __name__ == '__main__':
-    file=open("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/DoubleSNPRef.fasta","w")
-    SNPLog=pd.DataFrame()
-    for record in SeqIO.parse("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/Ecoli_double_ref.fasta","fasta"):
+    file=open("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/Jesse_full_db_3strain_SNP.fasta","w")
+    SNPLog=pd.DataFrame()  #Empty DF to append SNP info to
+    
+    
+    for record in SeqIO.parse("/home/noyes046/shared/databases/Jesse_database/Jesse_full_db_3strain.fasta","fasta"):
         #print(record.seq,record.letter_annotations["phred_quality"])
         print(record.id)
         # Oldseq=record.seq
@@ -100,5 +102,5 @@ if __name__ == '__main__':
 
         SNPLog=pd.concat([SNPLog,SNPDataFrame])
 
-    SNPLog.to_csv('/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/DoubleSNPLog.csv',index=False)
+    SNPLog.to_csv('/home/noyes046/shared/projects/SNP_Call_Benchmarking/Simulated_Datasets/Full3SNPLog.csv',index=False)
     file.close()
