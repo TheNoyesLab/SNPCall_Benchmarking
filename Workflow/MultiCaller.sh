@@ -99,4 +99,3 @@ conda activate InSilicoSeq
 python $SimPath/Workflows/Compare_vcf.py -i $SimPath/$data_path/Disco_Out/Disco_Out_k_31_c_3_D_100_P_3_b_0_coherent_for_IGV.vcf \
 	$SimPath/$data_path/Strelka_Out/variants.vcf $SimPath/$data_path/Freq_Out/FreqOut.vcf -G $SimPath/Full3SNPLog.csv
 
-
