@@ -54,7 +54,7 @@ python SNP_Injector_Fasta.py -s 2 -r $db
 
 ###Start InSilicoSeq
 echo "Start InSilicoSeq"
-subsets=("0.5" "1")
+subsets=("15")
 for j in "${subsets[@]}"
 do
 	iss generate --genomes $Bench/Benchmarking_Run/SNP_Injector/Jesse_full_db_2strain_SNP.fasta -n ${j}m --cpus 16 --mode perfect --output $Bench/Benchmarking_Run/M${j}/Sim${j}_reads
@@ -68,7 +68,7 @@ echo "Start Alignment"
 
 conda activate Align
 
-subset2=("0.5" "1")
+subset2=("15")
 for k in "${subset2[@]}"
 do
 Set="$Bench/Benchmarking_Run/M$k"
@@ -79,6 +79,6 @@ bwa mem -t 10 -R "@RG\tID:M${k}\tSM:2Strain\tPL:Illumina" $db \
 samtools view -S -b $Align/Sim${k}_Ref.sam > $Align/Sim${k}_Ref.bam
 samtools sort $Align/Sim${k}_Ref.bam -o $Align/Sim${k}_Ref_sorted.bam
 samtools index $Align/Sim${k}_Ref_sorted.bam
-bedtools bamtobem -i $Align/Sim${k}_Ref_sorted.bam > $Align/Sim${k}_Ref_sorted.bed
+bedtools bamtobed -i $Align/Sim${k}_Ref_sorted.bam > $Align/Sim${k}_Ref_sorted.bed
 
 done
