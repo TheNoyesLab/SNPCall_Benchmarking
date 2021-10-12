@@ -10,6 +10,9 @@ db="/home/noyes046/shared/databases/Jesse_database/Jesse_full_db.fasta"
 . /home/noyes046/elder099/anaconda3/etc/profile.d/conda.sh
 
 
+#Datasets to loop through (read count)
+datasets=("25")
+
 
 ###Start FreeBayes
 echo "Start FreeBayes"
@@ -17,8 +20,7 @@ echo "Start FreeBayes"
 #Start FB environment
 conda activate FreeBayes
 
-subset2=("15")
-for i in "${subset2[@]}"
+for i in "${datasets[@]}"
 do
 Align="$Bench/Benchmarking_Run/M$i/Alignment"
 
@@ -29,7 +31,7 @@ freebayes-parallel <(fasta_generate_regions.py ${db}.fai 100000) 16 -f $db -p 1 
 done
 
 #####
-#####START DISCOSNP
+#####START GATK
 #####
 
 #Start GATK environment
@@ -38,8 +40,7 @@ conda activate GATK
 
 #gatk CreateSequenceDictionary -R /home/noyes046/shared/databases/Jesse_database/Jesse_full_db.fasta
 
-subset2=("15")
-for i in "${subset2[@]}"
+for i in "${datasets[@]}"
 do
 gatk HaplotypeCaller\
         -R $db \
@@ -56,8 +57,7 @@ echo "Start DiscoSNP"
 #Start DiscoSNP environment
 conda activate DiscoSNP
 
-subset2=("15")
-for i in "${subset2[@]}"
+for i in "${datasets[@]}"
 do
 run_discoSnp++.sh -r $Bench/Benchmarking_Run/M${i}/Fastqlist_Disco.txt \
         -G $db\
@@ -77,8 +77,7 @@ echo "Start MetaSNV"
 conda activate metasnv
 
 
-subset2=("15")
-for i in "${subset2[@]}"
+for i in "${datasets[@]}"
 do
 metaSNV.py $Bench/Benchmarking_Run/M${i}/Meta_Out \
         $Bench/Benchmarking_Run/M${i}/meta_sample_list.txt \
@@ -100,7 +99,7 @@ echo "Start Benchmarking"
 #Start env with biopython (like InSilicoSeq)
 conda activate InSilicoSeq
 
-for k in "${subset2[@]}"
+for k in "${datasets[@]}"
 do
 
 python ../Benchmarking/Compare_vcf.py -i $Bench/Benchmarking_Run/M${k}/FB_Out/FB_Out.vcf $Bench/Benchmarking_Run/M${k}/Disco_Out/Disco_Out_k_31_c_3_D_100_P_3_b_0_coherent.vcf $Bench/Benchmarking_Run/M${k}/GATK_Out/GATOut.vcf -G $Bench/Benchmarking_Run/SNP_Injector/Full2SNPLog.csv

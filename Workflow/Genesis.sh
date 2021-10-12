@@ -16,8 +16,8 @@ db="/home/noyes046/shared/databases/Jesse_database/Jesse_full_db.fasta"
 mkdir "$Bench/Benchmarking_Run"
 mkdir "$Bench/Benchmarking_Run/SNP_Injector"
 
-numreads=("0.5" "1" "5" "10" "15" "25") #just the number
-datasets=("0.5" "1" "5" "10" "15" "25") #name of datasets/directories
+
+datasets=("0.5" "1" "5" "10" "15" "25" "50") #name of datasets/directories
 
 for i in "${datasets[@]}"
 do
@@ -54,10 +54,10 @@ python SNP_Injector_Fasta.py -s 2 -r $db
 
 ###Start InSilicoSeq
 echo "Start InSilicoSeq"
-subsets=("15")
-for j in "${subsets[@]}"
+
+for j in "${datasets[@]}"
 do
-	iss generate --genomes $Bench/Benchmarking_Run/SNP_Injector/Jesse_full_db_2strain_SNP.fasta -n ${j}m --cpus 16 --mode perfect --output $Bench/Benchmarking_Run/M${j}/Sim${j}_reads
+	iss generate --genomes $Bench/Benchmarking_Run/SNP_Injector/Jesse_full_db_2strain_SNP.fasta -n ${j}m --cpus 16 --model miseq --output $Bench/Benchmarking_Run/M${j}/Sim${j}_reads
 
 done
 
@@ -68,8 +68,7 @@ echo "Start Alignment"
 
 conda activate Align
 
-subset2=("15")
-for k in "${subset2[@]}"
+for k in "${datasets[@]}"
 do
 Set="$Bench/Benchmarking_Run/M$k"
 Align="$Bench/Benchmarking_Run/M$k/Alignment"
