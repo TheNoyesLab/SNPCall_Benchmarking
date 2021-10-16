@@ -3,8 +3,11 @@ import sys
 import argparse
 import io
 import os
+import os.path
+import re
 import pandas as pd
 import numpy as np
+
 
 #####
 #####HELPER FUNCTIONS
@@ -42,7 +45,7 @@ def read_vcf(path):
 def Bench(Log,Calldf):
 
     ###MATCHING POSITION AND SNP
-    TPList=pd.merge(Log,Calldf, how="inner",on=['POS','ALT','REF'])   #Input ALT in Log at POS match ALT called by GATK at POS
+    TPList=pd.merge(Log,Calldf, how="inner",on=['CHROM','POS','ALT','REF'])   #Input ALT in Log at POS match ALT called by GATK at POS
 
     RealP=len(Log.index)    #All ACTUAL variants in SNP_Log.csv
     PredP=len(Calldf.index)  #All PREDICTED variants called by GATK
@@ -54,7 +57,9 @@ def Bench(Log,Calldf):
     Precision=TP/PredP  #True positives over # of predicted positives (the # of SNP Caller calls)
     Recall=TP/RealP     #True positives over # of Actual positives
     Fscore=2*(Precision*Recall)/(Precision+Recall)        #Harmonic Mean of Precision & Recall
-
+    
+    print("Variant Caller:",Call_name)
+    print("Number of Reads:", Coverage)
     print("True Positives:",TP)
     print("False Positives:",FP)
     print("False Negatives:",FN)
@@ -62,43 +67,25 @@ def Bench(Log,Calldf):
     print("Precision:",Precision)
     print("Recall:",Recall)
     print("Harmonic Mean of Precision and Recall i.e. the F-score:",Fscore,"\n")
+    
+
+    ###Making Dataframes for output into files
+    Adddict = {'VCaller': Call_name,'Dataset':Coverage,'TP': [TP], 'FP': [FP], 'FN': [FN], 'Precision': [Precision], 'Recall': [Recall], 'F-score': [Fscore]}
+    Addframe = pd.DataFrame(data=Adddict) #Make dataframe to add to current file
+    print(Addframe)
 
 
+    if os.path.exists(out_file):                    #If file already made, append Addframe to it
+        Inframe = pd.read_csv(out_file)             #Old file
+        Outframe = pd.concat([Inframe,Addframe])    #Append new file to old file
+        Outframe.to_csv(out_file,index=False)
+    else:                                           #If file not made, make it with the Addframe
+        Addframe.to_csv(out_file,index=False)
 
-###Read in all of the vcf-like files manually -- now can be done in command line
-# GATK=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/GATKOut_Jesse.vcf")
-# GATKMulti=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/GATKMultiOut.vcf")
-# LoFreq=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/FreqOut.vcf")
-# LoFreqMulti=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/FreqMultiOut.vcf")
-# Meta=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/Meta_Out_Fix.vcf",sep="\t",names=["CHROM","DASH","POS","REF","QUAL","ALT"])
-# Disco=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/Disco_Out.vcf")
-# DubStrelka=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/Strelka_Double.vcf")
-# DubFreq=read_vcf("/Users/Gawdcomplex/Desktop/NoyesLab/FreqDoubleOut.vcf")
-#
-# Log=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/SNPLog.csv")
-# Log1=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/SNPLog1.csv")
-# DubLog=pd.read_csv("/Users/Gawdcomplex/Desktop/NoyesLab/DoubleSNPLog.csv")
 
-# print("VARIANT CALLER BENCHMARKING","\n","\n")
-# print("GATK-HC")
-# #Bench(Log,GATK)
-# print("LoFreq")
-# #Bench(Log,LoFreq)
-# print("MetaSNV")
-# #Bench(Log,Meta)
-# print("GATKMulti")
-# Bench(Log1,GATKMulti)
-# print("LoFreqMulti")
-# Bench(Log1,LoFreqMulti)
-#
-# print("DiscoSNP")
-# Bench(DubLog,Disco)
-#
-# print("Strelka")
-# Bench(DubLog,DubStrelka)
-#
-# print("LoFreq")
-# Bench(DubLog,DubFreq)
+    #return Outframe
+
+
 
 print("\n","\n","\n")
 
@@ -108,8 +95,15 @@ if __name__ == '__main__':
     opts = parse_cmdline_params(sys.argv[1:])
     vcf_files = opts.input_vcf  #input list of vcfs
     gold_file = pd.read_csv(opts.gold_standard) #input known SNPs in csv
+    out_file = "/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/Benchmark.csv"    
+
 
     for f in vcf_files:
         vcf_frame = read_vcf(f)
-        print(f)
-        Bench(gold_file,vcf_frame)
+        Call_name = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/M[0-9]*/(.*?)/.*", f).group(1) #Extract only the Variant Caller's name
+        Coverage = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/(M[0-9]*)/.*", f).group(1) #Extract only the # of reads in dataset
+        print(Call_name)            #Print the caller's name
+        print(Coverage)             #Print the read count of dataset
+        Bench(gold_file,vcf_frame)  #Do benchmarking
+
+
