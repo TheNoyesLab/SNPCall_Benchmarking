@@ -28,11 +28,13 @@ conda activate GATK
 for i in "${datasets[@]}"
 do
 Align="$Bench/Benchmarking_Run/M$i/Alignment"
-{ timing=$( { time gatk HaplotypeCaller\
+/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/GATK_Out/GATK_Time.txt gatk HaplotypeCaller \
         -R $db --native-pair-hmm-threads 16 \
         -I $Align/Sim${i}_Ref_sorted.bam \
-        -O $Bench/Benchmarking_Run/M${i}/GATK_Out/GATOut.vcf -ploidy 1 1>&3- 2>&4-; } 2>&1 ); } 3>&1 4>&2
-echo $timing
+        -O $Bench/Benchmarking_Run/M${i}/GATK_Out/GATOut.vcf -ploidy 1 2>&1 
+#echo "GATK $timing" > $Bench/Benchmarking_Run/M${i}/GATK_Out/GATK_Time.txt
+#cat $Bench/Benchmarking_Run/M${i}/GATK_Out/GATK_Time.txt
+
 done
 
 

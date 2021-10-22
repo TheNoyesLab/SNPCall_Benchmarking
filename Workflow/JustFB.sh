@@ -11,7 +11,7 @@ db="/home/noyes046/shared/databases/Jesse_database/Jesse_full_db.fasta"
 
 
 #Datasets to loop through (read count)
-datasets=("25")
+datasets=("1")
 
 
 ###Start FreeBayes
@@ -24,10 +24,10 @@ for i in "${datasets[@]}"
 do
 Align="$Bench/Benchmarking_Run/M$i/Alignment"
 
-freebayes-parallel <(fasta_generate_regions.py ${db}.fai 100000) 50 -f $db -p 1 \
+/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Time.txt freebayes-parallel <(fasta_generate_regions.py ${db}.fai 100000) 16 -f $db -p 1 \
         $Align/Sim${i}_Ref_sorted.bam > $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out.vcf
 #freebayes -f $db -p 1 $Align/Sim${i}_Ref_sorted.bam > $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out.vcf   #This is the non-parallel version
-vcftools --vcf $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out.vcf --minQ 20 --recode --out $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out_Filter
+/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/FB_Out/VCF_Time.txt vcftools --vcf $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out.vcf --minQ 20 --recode --out $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out_Filter
 done
 
 
