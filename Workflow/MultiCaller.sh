@@ -13,8 +13,9 @@ db="/home/noyes046/shared/databases/Jesse_database/Jesse_full_db.fasta"
 #Datasets to loop through (read count)
 datasets=("0.5" "1" "5" "10" "15" "25" "50")
 
-
-###Start FreeBayes
+#####
+#####Start FreeBayes
+#####
 echo "Start FreeBayes"
 
 #Start FB environment
@@ -24,11 +25,13 @@ for i in "${datasets[@]}"
 do
 Align="$Bench/Benchmarking_Run/M$i/Alignment"
 
-freebayes-parallel <(fasta_generate_regions.py ${db}.fai 100000) 64 -f $db -p 1 \
+/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Time.txt freebayes-parallel <(fasta_generate_regions.py ${db}.fai 100000) 16 -f $db -p 1 \
         $Align/Sim${i}_Ref_sorted.bam > $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out.vcf
-vcftools --vcf $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out.vcf --minQ 20 --recode --out $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out_Filter  #Filter out bad calls
-
+#freebayes -f $db -p 1 $Align/Sim${i}_Ref_sorted.bam > $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out.vcf   #This is the non-parallel version
+/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/FB_Out/VCF_Time.txt vcftools --vcf $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out.vcf --minQ 20 --recode --out $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out_Filter
 done
+
+
 
 #####
 #####START GATK
@@ -43,10 +46,12 @@ conda activate GATK
 for i in "${datasets[@]}"
 do
 Align="$Bench/Benchmarking_Run/M$i/Alignment"
-gatk HaplotypeCaller\
-        -R $db --native-pair-hmm-threads 64 \
+
+/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/GATK_Out/GATK_Time.txt gatk HaplotypeCaller \
+        -R $db --native-pair-hmm-threads 16 \
         -I $Align/Sim${i}_Ref_sorted.bam \
-        -O $Bench/Benchmarking_Run/M${i}/GATK_Out/GATOut.vcf -ploidy 1
+        -O $Bench/Benchmarking_Run/M${i}/GATK_Out/GATOut.vcf -ploidy 1 2>&1
+
 done
 
 
@@ -60,11 +65,10 @@ conda activate DiscoSNP
 
 for i in "${datasets[@]}"
 do
-run_discoSnp++.sh -r $Bench/Benchmarking_Run/M${i}/Fastqlist_Disco.txt \
+/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/Disco_Out/Disco_Time.txt run_discoSnp++.sh -r $Bench/Benchmarking_Run/M${i}/Fastqlist_Disco.txt \
         -G $db\
-        --bwa_path ~/.conda/envs/DiscoSNP/bin/ -p Disco_Out -u 64
+        --bwa_path ~/.conda/envs/DiscoSNP/bin/ -p Disco_Out -u 16
 mv $Bench/SNPCall_Benchmarking/Workflow/Disco_Out*  $Bench/Benchmarking_Run/M${i}/Disco_Out/
-
 done
 
 
@@ -80,9 +84,9 @@ conda activate metasnv
 
 for i in "${datasets[@]}"
 do
-metaSNV.py $Bench/Benchmarking_Run/M${i}/Meta_Out \
+/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/Meta_Out/Meta_Time.txt metaSNV.py $Bench/Benchmarking_Run/M${i}/Meta_Out \
         $Bench/Benchmarking_Run/M${i}/meta_sample_list.txt \
-        $db --threads 64 --min_pos_snvs 3
+        $db --threads 64
 
 
 cat $Bench/Benchmarking_Run/M${i}/Meta_Out/snpCaller/called_SNPs.best_split_* | sed -n -e 's/[0-9][0-9]*|//g; /[ACTG]/ s/|.*//p' > $Bench/Benchmarking_Run/M${i}/Meta_Out/Meta_Out_Fix.csv
