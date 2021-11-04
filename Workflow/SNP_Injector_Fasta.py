@@ -99,7 +99,9 @@ if __name__ == '__main__':
     opts = parse_cmdline_params(sys.argv[1:])
     num_strains = opts.strains  #input number of strains
     Ref = opts.ref_db           #input filepath of reference database
-
+    
+    
+    
     filename= "/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/SNP_Injector/Jesse_full_db_" + str(num_strains) + "strain_SNP.fasta"
     file=open(filename,"w")
 
@@ -125,3 +127,37 @@ if __name__ == '__main__':
     SNPLog_file="/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/SNP_Injector/Full" + str(num_strains) + "SNPLog.csv"
     SNPLog.to_csv(SNPLog_file,index=False)
     file.close()
+
+
+
+    ###########################################
+    #####SUBSETTING REFERENCE DATABASE & SNPLOG
+    ###########################################
+    for num in [5,15,25,35]:
+        #Choose random reference sequences to keep
+        Num_seqs=random.sample(range(35),num)
+        print("Num_seqs:", Num_seqs)
+        
+        file=open(filename,"r")  #Open this file every loop
+        counter=0
+        subsamp_seq=[] #An empty list to add selected reference sequence records
+        subsamp_ids=[] #An empty list to add selected reference IDs
+        for record in SeqIO.parse(file,"fasta"):
+            if counter in Num_seqs:
+                subsamp_seq.append(record) #Add sequences based on RNG
+                subsamp_ids.append(record.id[:-2]) #Add sequence ID minus strain number
+                print(record.id)
+            if counter in [strain+35 for strain in Num_seqs]:
+                subsamp_seq.append(record) #Add second strain
+                subsamp_ids.append(record.id[:-2]) #Add sequence ID minus strain number
+                print(record.id)
+            counter=counter+1
+        file.close() #Close it and open every loop (refresh the iterator)
+        out_subset="/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/SNP_Injector/DB_subset" + str(num) + ".fasta"  #output location for each subset
+        SeqIO.write(subsamp_seq,out_subset,"fasta")
+
+        Sub_SNPLog=SNPLog[SNPLog["CHROM"].isin(subsamp_ids)]
+        print("Unique values of Subset SNPLog:",Sub_SNPLog["CHROM"].unique())
+        out_SNP_subset="/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/SNP_Injector/SNPLog_subset" + str(num) + ".csv" #output location for subsets of SNP Logs
+        Sub_SNPLog.to_csv(out_SNP_subset,index=False)
+
