@@ -161,3 +161,16 @@ if __name__ == '__main__':
         out_SNP_subset="/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/SNP_Injector/SNPLog_subset" + str(num) + ".csv" #output location for subsets of SNP Logs
         Sub_SNPLog.to_csv(out_SNP_subset,index=False)
 
+        ###############################
+        ###Subset the Un-SNP'd database
+        ###############################
+        subsamp_noSNP_seq=[] #Empty list to put selected genomes in
+
+        for noSNPrecord in SeqIO.parse(Ref,"fasta"):
+            if noSNPrecord.id in subsamp_ids:  #Grab the Un-SNP'd Reference Genomes using the selected IDs
+                subsamp__noSNP_seq.append(noSNPrecord)
+        
+        out_noSNP_file="/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/SNP_Injector/DB_noSNP_subset" + str(num) + ".fasta"
+        SeqIO.write(subsamp_noSNP_seq,out_noSNP_file,"fasta")
+
+

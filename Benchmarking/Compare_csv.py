@@ -49,6 +49,7 @@ def Bench(Log,Calldf):
 
     print("Variant Caller:",Call_name)
     print("Number of Reads:", Coverage)
+    print("Subset:", Subset)
     print("True Positives:",TP)
     print("False Positives:",FP)
     print("False Negatives:",FN)
@@ -59,9 +60,9 @@ def Bench(Log,Calldf):
 
 
     ###Making Dataframes for output into files
-    Adddict = {'VCaller': Call_name,'Dataset':Coverage,'TP': [TP], 'FP': [FP], 'FN': [FN], 'Precision': [Precision], 'Recall': [Recall], 'F-score': [Fscore]}
+    Adddict = {'VCaller': Call_name,'Subset':Subset,'Dataset':Coverage,'TP': [TP], 'FP': [FP], 'FN': [FN], 'Precision': [Precision], 'Recall': [Recall], 'F-score': [Fscore]}
     Addframe = pd.DataFrame(data=Adddict) #Make dataframe to add to current file
-    print(Addframe)
+    #print(Addframe)
 
 
     if os.path.exists(out_file):                    #If file already made, append Addframe to it
@@ -87,20 +88,24 @@ if __name__ == '__main__':
     if bact_file is not None:
         print("BactSNP") 
         bact_frame = pd.read_csv(bact_file,sep="\t",header=0,names=["CHROM","POS","REF","ALT"]) #load into DF replacing column names
-        Call_name = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/M[0-9]*/(.*?)/.*", bact_file).group(1) #Extract only the Variant Caller's name
-        Coverage = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/(M[0-9]*)/.*", bact_file).group(1) #Extract only the # of reads in dataset
-        print(Call_name)            #Print the caller's name
-        print(Coverage)             #Print the read count of dataset
+        Call_name = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/S[0-9]*/M[0-9]*\.*[0-9]*/(.*?)/.*", bact_file).group(1) #Extract only the Variant Caller's name
+        Coverage = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/S[0-9]*/(M[0-9]*\.*[0-9]*)/.*", bact_file).group(1) #Extract only the # of reads in dataset
+        Subset = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/(S[0-9]*)/.*", bact_file).group(1) #Extract only the # of reads in dataset
+        #print(Call_name)            #Print the caller's name
+        #print(Coverage)             #Print the read count of dataset
+        #print(Subset)               #Print the number of reference genomes
         Bench(gold_file,bact_frame)
 
 
     if meta_file is not None:
         print("MetaSNV")
         meta_frame = pd.read_csv(meta_file,sep="\t",names=["CHROM","DASH","POS","REF","QUAL","ALT"]) #load into DF add column names
-        Call_name = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/M[0-9]*/(.*?)/.*", meta_file).group(1) #Extract only the Variant Caller's name
-        Coverage = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/(M[0-9]*)/.*", meta_file).group(1) #Extract only the # of reads in dataset
-        print(Call_name)            #Print the caller's name
-        print(Coverage)             #Print the read count of dataset
+        Call_name = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/S[0-9]*/M[0-9]*\.*[0-9]*/(.*?)/.*", meta_file).group(1) #Extract only the Variant Caller's name
+        Coverage = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/S[0-9]*/(M[0-9]*\.*[0-9]*)/.*", meta_file).group(1) #Extract only the # of reads in dataset
+        Subset = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/(S[0-9]*)/.*", meta_file).group(1) #Extract only the # of reference genomes in dataset
+        #print(Call_name)            #Print the caller's name
+        #print(Coverage)             #Print the read count of dataset
+        #print(Subset)               #Print the number of reference genomes
         Bench(gold_file,meta_frame)
 
 

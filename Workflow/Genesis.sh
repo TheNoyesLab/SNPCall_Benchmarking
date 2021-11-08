@@ -77,26 +77,29 @@ conda activate Align
 
 for j in "${subsets[@]}"
 do
-	sub_db="$Bench/SNP_Injector/DB_subset${j}.fasta"
+        sub_db="$Bench/SNP_Injector/DB_noSNP_subset${j}.fasta"
+        bwa index $sub_db
+	samtools faidx $sub_db
+
+        #Dictionary for GATK
+        gatk CreateSequenceDictionary -R $sub_db
 
         for i in "${datasets[@]}"
         do
-		echo ""
-		echo "Align: Subset $j, Dataset: $i"
-                
-		Set="$Bench/S$j/M$i"
+                echo ""
+                echo "Align: Subset $j, Dataset: $i"
+
+                Set="$Bench/S$j/M$i"
                 Align="$Bench/S$j/M$i/Alignment"
-		
-		#Dictionary for GATK
-		gatk CreateSequenceDictionary -R $sub_db 
-	
+
+
                 #Do Alignment
                 bwa mem -t 64 -R "@RG\tID:M${i}\tSM:2Strain\tPL:Illumina" $sub_db \
                         $Set/Sim${i}_reads_R1.fastq $Set/Sim${i}_reads_R2.fastq > $Align/Sim${i}_Ref.sam
 
                 #Alignment post-processing
-                samtools view -S -b $Align/Sim${i}_Ref.sam > $Align/Sim${i}_Ref.bam
-                samtools sort $Align/Sim${i}_Ref.bam -o $Align/Sim${i}_Ref_sorted.bam
+                samtools view -S -b $Align/Sim${i}_Ref.sam > $Align/Sim${i}_Ref.bam --threads 16
+                samtools sort $Align/Sim${i}_Ref.bam -o $Align/Sim${i}_Ref_sorted.bam --threads 16
                 samtools index $Align/Sim${i}_Ref_sorted.bam
                 bedtools bamtobed -i $Align/Sim${i}_Ref_sorted.bam > $Align/Sim${i}_Ref_sorted.bed
 
@@ -105,7 +108,5 @@ do
                 rm $Align/Sim${i}_Ref.bam
         done
 done
-
-
 
 

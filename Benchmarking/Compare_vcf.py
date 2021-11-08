@@ -60,6 +60,7 @@ def Bench(Log,Calldf):
     
     print("Variant Caller:",Call_name)
     print("Number of Reads:", Coverage)
+    print("Data Subset:", Subset)
     print("True Positives:",TP)
     print("False Positives:",FP)
     print("False Negatives:",FN)
@@ -70,9 +71,9 @@ def Bench(Log,Calldf):
     
 
     ###Making Dataframes for output into files
-    Adddict = {'VCaller': Call_name,'Dataset':Coverage,'TP': [TP], 'FP': [FP], 'FN': [FN], 'Precision': [Precision], 'Recall': [Recall], 'F-score': [Fscore]}
+    Adddict = {'VCaller': Call_name,'Subset':Subset,'Dataset':Coverage,'TP': [TP], 'FP': [FP], 'FN': [FN], 'Precision': [Precision], 'Recall': [Recall], 'F-score': [Fscore]}
     Addframe = pd.DataFrame(data=Adddict) #Make dataframe to add to current file
-    print(Addframe)
+    #print(Addframe)
 
 
     if os.path.exists(out_file):                    #If file already made, append Addframe to it
@@ -100,10 +101,12 @@ if __name__ == '__main__':
 
     for f in vcf_files:
         vcf_frame = read_vcf(f)
-        Call_name = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/M[0-9]*/(.*?)/.*", f).group(1) #Extract only the Variant Caller's name
-        Coverage = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/(M[0-9]*)/.*", f).group(1) #Extract only the # of reads in dataset
-        print(Call_name)            #Print the caller's name
-        print(Coverage)             #Print the read count of dataset
+        Call_name = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/S[0-9]*/M[0-9]*\.*[0-9]*/(.*?)/.*", f).group(1) #Extract only the Variant Caller's name
+        Coverage = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/S[0-9]*/(M[0-9]*\.*[0-9]*)/.*", f).group(1) #Extract only the # of reads in dataset
+        Subset = re.search("/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run/(S[0-9]*)/.*", f).group(1) #Extract only the # of reference genomes in dataset
+        #print(Call_name)            #Print the caller's name
+        #print(Coverage)             #Print the read count of dataset
+        #print(Subset)               #Print the number of references in the dataset
         Bench(gold_file,vcf_frame)  #Do benchmarking
 
 

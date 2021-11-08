@@ -2,8 +2,8 @@
 
 
 ###Shortcut variables
-Bench="/home/noyes046/shared/projects/SNP_Call_Benchmarking"
-db="/home/noyes046/shared/databases/Jesse_database/Jesse_full_db.fasta"
+Bench="/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmarking_Run"
+db="/home/noyes046/shared/databases/Jesse_database/Full_Sanchez_DB.fasta"
 
 
 ###Start conda
@@ -12,6 +12,10 @@ db="/home/noyes046/shared/databases/Jesse_database/Jesse_full_db.fasta"
 
 #Datasets to loop through (read count)
 datasets=("0.5" "1" "5" "10" "15" "25" "50")
+subsets=("5" "15" "25" "35") #number of reference sequences subsampled
+
+
+
 
 #####
 #####Start FreeBayes
@@ -21,14 +25,20 @@ echo "Start FreeBayes"
 #Start FB environment
 conda activate FreeBayes
 
-for i in "${datasets[@]}"
+for j in "${subsets[@]}"
 do
-Align="$Bench/Benchmarking_Run/M$i/Alignment"
+	sub_db="$Bench/SNP_Injector/DB_noSNP_subset${j}.fasta"
 
-/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Time.txt freebayes-parallel <(fasta_generate_regions.py ${db}.fai 100000) 16 -f $db -p 1 \
-        $Align/Sim${i}_Ref_sorted.bam > $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out.vcf
-#freebayes -f $db -p 1 $Align/Sim${i}_Ref_sorted.bam > $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out.vcf   #This is the non-parallel version
-/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/FB_Out/VCF_Time.txt vcftools --vcf $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out.vcf --minQ 20 --recode --out $Bench/Benchmarking_Run/M${i}/FB_Out/FB_Out_Filter
+	for i in "${datasets[@]}"
+	do
+		Align="$Bench/S$j/M$i/Alignment"
+
+		/usr/bin/time -v -o $Bench/S$j/M$i/FB_Out/FB_Time.txt freebayes-parallel <(fasta_generate_regions.py ${sub_db}.fai 250000) 32 -f $sub_db -p 1 \
+        		$Align/Sim${i}_Ref_sorted.bam > $Bench/S$j/M$i/FB_Out/FB_Out.vcf
+		#freebayes -f $db -p 1 $Align/Sim${i}_Ref_sorted.bam > $Bench/S$j/M$i/FB_Out/FB_Out.vcf   #This is the non-parallel version
+		/usr/bin/time -v -o $Bench/S$j/M$i/FB_Out/VCF_Time.txt vcftools --vcf $Bench/S$j/M$i/FB_Out/FB_Out.vcf --minQ 20 --recode --out $Bench/S$j/M$i/FB_Out/FB_Out_Filter
+
+	done
 done
 
 
@@ -41,17 +51,23 @@ done
 conda activate GATK
 
 
-#gatk CreateSequenceDictionary -R /home/noyes046/shared/databases/Jesse_database/Jesse_full_db.fasta
 
-for i in "${datasets[@]}"
+
+for j in "${subsets[@]}"
 do
-Align="$Bench/Benchmarking_Run/M$i/Alignment"
+	sub_db="$Bench/SNP_Injector/DB_noSNP_subset${j}.fasta"
 
-/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/GATK_Out/GATK_Time.txt gatk HaplotypeCaller \
-        -R $db --native-pair-hmm-threads 16 \
-        -I $Align/Sim${i}_Ref_sorted.bam \
-        -O $Bench/Benchmarking_Run/M${i}/GATK_Out/GATOut.vcf -ploidy 1 2>&1
+	for i in "${datasets[@]}"
+	do
+		Align="$Bench/S$j/M$i/Alignment"
 
+
+		/usr/bin/time -v -o $Bench/S$j/M$i/GATK_Out/GATK_Time.txt gatk HaplotypeCaller \
+        		-R $sub_db --native-pair-hmm-threads 32 \
+        		-I $Align/Sim${i}_Ref_sorted.bam \
+        		-O $Bench/S$j/M$i/GATK_Out/GATOut.vcf -ploidy 1 2>&1
+
+	done
 done
 
 
@@ -63,12 +79,20 @@ echo "Start DiscoSNP"
 #Start DiscoSNP environment
 conda activate DiscoSNP
 
-for i in "${datasets[@]}"
+Work="/home/noyes046/shared/projects/SNP_Call_Benchmarking/SNPCall_Benchmarking" #Workflow path to move files from
+
+for j in "${subsets[@]}"
 do
-/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/Disco_Out/Disco_Time.txt run_discoSnp++.sh -r $Bench/Benchmarking_Run/M${i}/Fastqlist_Disco.txt \
-        -G $db\
-        --bwa_path ~/.conda/envs/DiscoSNP/bin/ -p Disco_Out -u 16
-mv $Bench/SNPCall_Benchmarking/Workflow/Disco_Out*  $Bench/Benchmarking_Run/M${i}/Disco_Out/
+	sub_db="$Bench/SNP_Injector/DB_noSNP_subset${j}.fasta"
+
+	for i in "${datasets[@]}"
+	do
+		/usr/bin/time -v -o $Bench/S$j/M$i/Disco_Out/Disco_Time.txt run_discoSnp++.sh -r $Bench/S$j/M$i/Fastqlist_Disco.txt \
+        		-G $sub_db\
+        		--bwa_path ~/.conda/envs/DiscoSNP/bin/ -p Disco_Out -u 32
+		mv $Work/Workflow/Disco_Out*  $Bench/S$j/M$i/Disco_Out/
+	
+	done
 done
 
 
@@ -81,17 +105,24 @@ echo "Start MetaSNV"
 #Start metasnv environment
 conda activate metasnv
 
-
-for i in "${datasets[@]}"
+for j in "${subsets[@]}"
 do
-/usr/bin/time -v -o $Bench/Benchmarking_Run/M${i}/Meta_Out/Meta_Time.txt metaSNV.py $Bench/Benchmarking_Run/M${i}/Meta_Out \
-        $Bench/Benchmarking_Run/M${i}/meta_sample_list.txt \
-        $db --threads 64
+	sub_db="$Bench/SNP_Injector/DB_noSNP_subset${j}.fasta"
 
+	for i in "${datasets[@]}"
+	do
+		/usr/bin/time -v -o $Bench/S$j/M$i/Meta_Time.txt metaSNV.py $Bench/S$j/M$i/Meta_Out \
+        		$Bench/S$j/M$i/meta_sample_list.txt \
+        		$sub_db --threads 32
 
-cat $Bench/Benchmarking_Run/M${i}/Meta_Out/snpCaller/called_SNPs.best_split_* | sed -n -e 's/[0-9][0-9]*|//g; /[ACTG]/ s/|.*//p' > $Bench/Benchmarking_Run/M${i}/Meta_Out/Meta_Out_Fix.csv
+		mv $Bench/S$j/M$i/Meta_Time.txt $Bench/S$j/M$i/Meta_Out/Meta_Time.txt #Move from outside in because Meta_Out didn't exist
+		cat $Bench/S$j/M$i/Meta_Out/snpCaller/called_SNPs.best_split_* | sed -n -e 's/[0-9][0-9]*|//g; /[ACTG]/ s/|.*//p' > $Bench/S$j/M$i/Meta_Out/Meta_Out_Fix.csv #Fix to look like normal csv
 
+	done
 done
+
+
+
 
 
 
@@ -104,12 +135,20 @@ echo "Start Benchmarking"
 #Start env with biopython (like InSilicoSeq)
 conda activate InSilicoSeq
 
-for k in "${datasets[@]}"
+
+for j in "${subsets[@]}"
 do
 
-python ../Benchmarking/Compare_vcf.py -i $Bench/Benchmarking_Run/M${k}/FB_Out/FB_Out_Filter.recode.vcf $Bench/Benchmarking_Run/M${k}/Disco_Out/Disco_Out_k_31_c_3_D_100_P_3_b_0_coherent.vcf $Bench/Benchmarking_Run/M${k}/GATK_Out/GATOut.vcf -G $Bench/Benchmarking_Run/SNP_Injector/Full2SNPLog.csv
+        for i in "${datasets[@]}"
+        do
 
-###Do non-standard format benchmarking
-python ../Benchmarking/Compare_csv.py -m $Bench/Benchmarking_Run/M${k}/Meta_Out/Meta_Out_Fix.csv -G $Bench/Benchmarking_Run/SNP_Injector/Full2SNPLog.csv 
+                python ../Benchmarking/Compare_vcf.py -i $Bench/S$j/M$i/FB_Out/FB_Out_Filter.recode.vcf $Bench/S$j/M$i/Disco_Out/Disco_Out_k_31_c_3_D_100_P_3_b_0_coherent.vcf $Bench/S$j/M$i/GATK_Out/GATOut.vcf -G $Bench/SNP_Injector/SNPLog_subset${j}.csv
+                #python ../Benchmarking/Compare_vcf.py -i $Bench/Benchmarking_Run/M${k}/FB_Out/FB_Out.vcf $Bench/Benchmarking_Run/M${k}/Samtools_Out/Sam_Out.vcf -G $Bench/Benchmarking_Run/SNP_Injector/Full2SNPLog.csv
 
+                ###Do non-standard format benchmarking
+                python ../Benchmarking/Compare_csv.py -m $Bench/S$j/M$i/Meta_Out/Meta_Out_Fix.csv -G $Bench/SNP_Injector/SNPLog_subset${j}.csv
+
+        done
 done
+
+
