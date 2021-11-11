@@ -16,7 +16,7 @@ library(tidyverse)
 library(RColorBrewer)
 library(reshape2)
 
-bench_df<- read.csv("~/Desktop/NoyesLab/Benchmark.csv")
+bench_df<- read.csv("~/Desktop/NoyesLab/All_Benchmarks.csv")
 #bench_df
 
 
@@ -232,7 +232,7 @@ ggplot(bench_melt,aes(x=Dataset_num,y=PR_value,colour=VCaller_f,group=interactio
 ggplot(bench_melt,aes(x=Subset_num,y=PR_value,colour=VCaller_f,group=interaction(VCaller_f,PR)) ) +
   geom_point() + geom_line(aes(linetype=PR)) + facet_wrap(~Dataset_f,nrow=1) +
   ggtitle("Variant Caller Accuracy by Number of Reads\n and Reference Genomes") +
-  xlab("Number of Reference Genomes") + ylab("F-Score") + labs(col="Variant Caller") +
+  xlab("Number of Reference Genomes") + ylab("Precision/Recall") + labs(col="Variant Caller") +
   scale_color_manual(values=cbbPalette) + theme_bw() +
   theme(plot.title = element_text(hjust=0.5,size=13,face="bold",margin=margin(0,0,15,0)),
         axis.title.x = element_text(face="bold",margin=margin(15,0,0,0)),
@@ -253,7 +253,7 @@ bench_super_melt<-gather(bench_df,"PRF","PRF_value",7:9)
 ggplot(bench_super_melt,aes(x=Dataset_num,y=PRF_value,colour=VCaller_f,group=interaction(VCaller_f,PRF))) + 
   geom_point() + geom_line(aes(linetype=PRF)) + facet_wrap(~Subset_f,nrow=2) +
   ggtitle("Variant Caller Accuracy by Number of Reads\n and Reference Genomes") +
-  xlab("Number of Reads (millions)") + ylab("Precision/Recall") + labs(col="Variant Caller") +
+  xlab("Number of Reads (millions)") + ylab("Accuracy Metric") + labs(col="Variant Caller") +
   scale_color_manual(values=cbbPalette) + theme_bw() +
   theme(plot.title = element_text(hjust=0.5,size=13,face="bold",margin=margin(0,0,15,0)),
         axis.title.x = element_text(face="bold",margin=margin(15,0,0,0)),
@@ -264,3 +264,91 @@ ggplot(bench_super_melt,aes(x=Dataset_num,y=PRF_value,colour=VCaller_f,group=int
 ```
 
 ## 1PRF
+
+
+
+
+
+
+
+# Time and Memory Benchmarks
+
+
+## These ones aren't that good
+```{r}
+tm_df<-gather(bench_df,"TM","TM_value",10:11)
+
+#Scaled axis, unscaled data
+ggplot(tm_df,aes(x=Dataset_num,y=TM_value,colour=VCaller_f,group=interaction(VCaller_f,TM))) + 
+  geom_point() + geom_line(aes(linetype=TM)) + facet_wrap(~Subset_f,nrow=2) +
+  ggtitle("Time & Memory Benchmarks by Number of Reads\n and Reference Genomes") +
+  xlab("Number of Reads (millions)") + ylab("Time (seconds)") + labs(col="Variant Caller") +
+  scale_y_continuous(name="Time (seconds)", sec.axis = sec_axis(~ 10*., name="Memory (MB)")) +
+  scale_color_manual(values=cbbPalette) + theme_bw() +
+  theme(plot.title = element_text(hjust=0.5,size=13,face="bold",margin=margin(0,0,15,0)),
+        axis.title.x = element_text(face="bold",margin=margin(15,0,0,0)),
+        axis.title.y = element_text(face="bold",margin=margin(0,15,0,0)),
+        legend.title = element_text(size = 10, face = "bold") ) 
+```
+
+## TM1
+
+```{r}
+#Scaled axis and data
+ggplot(bench_df) + 
+  geom_point(mapping = aes(x=Dataset_num,y=Time*2.75,colour=VCaller_f)) +
+  geom_line(mapping = aes(x=Dataset_num,y=Time*2.75,colour=VCaller_f),linetype=2) +
+  geom_point(mapping = aes(x=Dataset_num,y=Memory,colour=VCaller_f)) +
+  geom_line(mapping = aes(x=Dataset_num,y=Memory,colour=VCaller_f),linetype=1) +
+  facet_wrap(~Subset_f,nrow=2) +
+  ggtitle("Time & Memory Benchmarks by Number of Reads\n and Reference Genomes") +
+  xlab("Number of Reads (millions)") + ylab("Time (seconds)") + labs(col="Variant Caller") +
+  scale_y_continuous(name="Memory (MB)", sec.axis = sec_axis(~ ./2.75, name="Time (seconds)")) +
+  scale_color_manual(values=cbbPalette) + theme_bw() +
+  theme(plot.title = element_text(hjust=0.5,size=13,face="bold",margin=margin(0,0,15,0)),
+        axis.title.x = element_text(face="bold",margin=margin(15,0,0,0)),
+        axis.title.y = element_text(face="bold",margin=margin(0,15,0,0)),
+        legend.title = element_text(size = 10, face = "bold") ) 
+
+```
+
+## TM2
+\\
+
+# These are Fab
+```{r}
+ggplot(bench_df[bench_df$VCaller!="GATK",],aes(x=Dataset_num,y=Time,colour=VCaller_f,group=VCaller_f)) + 
+  geom_point() + geom_line() + facet_wrap(~Subset_f,nrow=2) +
+  ggtitle("Runtime by Number of Reads\n and Reference Genomes") +
+  xlab("Number of Reads (millions)") + ylab("Runtime (seconds)") + labs(col="Variant Caller") +
+  scale_color_manual(values=cbbPalette) + theme_bw() +
+  theme(plot.title = element_text(hjust=0.5,size=13,face="bold",margin=margin(0,0,15,0)),
+        axis.title.x = element_text(face="bold",margin=margin(15,0,0,0)),
+        axis.title.y = element_text(face="bold",margin=margin(0,15,0,0)),
+        legend.title = element_text(size = 10, face = "bold") + 
+        annotate("text",  x=30, y = 0.5,label="HELLO WORLD", vjust=1, hjust=1)) 
+```
+
+## T1
+
+```{r}
+ggplot(bench_df,aes(x=Dataset_num,y=Memory,colour=VCaller_f,group=VCaller_f)) + 
+  geom_point() + geom_line() + facet_wrap(~Subset_f,nrow=2) +
+  ggtitle("Peak Memory by Number of Reads\n and Reference Genomes") +
+  xlab("Number of Reads (millions)") + ylab("Peak Memory (MB)") + labs(col="Variant Caller") +
+  scale_color_manual(values=cbbPalette) + theme_bw() +
+  theme(plot.title = element_text(hjust=0.5,size=13,face="bold",margin=margin(0,0,15,0)),
+        axis.title.x = element_text(face="bold",margin=margin(15,0,0,0)),
+        axis.title.y = element_text(face="bold",margin=margin(0,15,0,0)),
+        legend.title = element_text(size = 10, face = "bold") + 
+        annotate("text",  x=30, y = 0.5,label="HELLO WORLD", vjust=1, hjust=1)) 
+
+```
+
+## T1
+
+
+
+
+
+
