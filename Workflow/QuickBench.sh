@@ -27,13 +27,21 @@ do
 
 	for i in "${datasets[@]}"
 	do
-
+		
+		###Do benchmarking on VCF files
 		python ../Benchmarking/Compare_vcf.py -i $Bench/S$j/M$i/FB_Out/FB_Out_Filter.recode.vcf $Bench/S$j/M$i/Disco_Out/Disco_Out_k_31_c_3_D_100_P_3_b_0_coherent.vcf $Bench/S$j/M$i/GATK_Out/GATOut.vcf -G $Bench/SNP_Injector/SNPLog_subset${j}.csv
-		#python ../Benchmarking/Compare_vcf.py -i $Bench/Benchmarking_Run/M${k}/FB_Out/FB_Out.vcf $Bench/Benchmarking_Run/M${k}/Samtools_Out/Sam_Out.vcf -G $Bench/Benchmarking_Run/SNP_Injector/Full2SNPLog.csv
 
 		###Do non-standard format benchmarking
 		python ../Benchmarking/Compare_csv.py -m $Bench/S$j/M$i/Meta_Out/Meta_Out_Fix.csv -G $Bench/SNP_Injector/SNPLog_subset${j}.csv
-
+		
+		###Extract the Time & Memory Benchmarks		
+		python ../Benchmarking/Time_Benchmarks.py -t $Bench/S$j/M$i/FB_Out/FB_Time.txt $Bench/S$j/M$i/GATK_Out/GATK_Time.txt $Bench/S$j/M$i/Disco_Out/Disco_Time.txt $Bench/S$j/M$i/Meta_Out/Meta_Time.txt
 	done
 done
+
+
+#Merge the Benchmarking Datasets together!!!
+echo "Final step: Merging Benchmarks!!!"
+python ../Benchmarking/Merge_Bench.py
+
 
