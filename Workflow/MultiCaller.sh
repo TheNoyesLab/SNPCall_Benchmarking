@@ -124,6 +124,22 @@ done
 
 
 
+#####
+#echo "Samtools"
+
+#Start samtools environment
+#for j in "${subsets[@]}"
+#do
+#        sub_db="$Bench/SNP_Injector/DB_noSNP_subset${j}.fasta"
+#
+#        for i in "${datasets[@]}"
+#        do
+#	
+#	#ENTER SAMTOOLS CODE HERE
+#
+#	done
+#done
+
 
 
 
