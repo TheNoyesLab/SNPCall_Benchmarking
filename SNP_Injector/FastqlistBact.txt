@@ -1,1 +1,0 @@
-Ecoli	/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmark_Space/SimSNP_reads_R1.fastq	/home/noyes046/shared/projects/SNP_Call_Benchmarking/Benchmark_Space/SimSNP_reads_R2.fastq
