@@ -1,5 +1,35 @@
 # SNPCall_Benchmarking
-Repo for scripts and files used in benchmarking variant callers
+Repo for scripts and files used in benchmarking variant callers on simulated shotgun metagenomic data.
+
+# Methods & Workflow
+
+<br/><br/>
+
+<p align="center">
+    <img src=https://github.com/TheNoyesLab/SNPCall_Benchmarking/blob/main/Benchmark_Workflow.png>
+</p>
+
+<p align="center">
+    <b>Figure 1.</b> Workflow diagram showing the variant caller benchmarking process. First, select RefSeq genomes were chosen to simulate a metagenome, random mutations were added to the genomes to create a "gold standard" dataset, then the number of genomes used and number of reads created were adjusted to evaluate the variant callers under a range of sample conditions.
+</p>
+
+<br/><br/>
+
+
+# Results
+
+<br/><br/>
+
+<p align="center">
+    <img src=https://github.com/TheNoyesLab/SNPCall_Benchmarking/blob/main/AccuracyBenchmarks.png>
+</p>
+
+<p align="center">
+    <img src=https://github.com/TheNoyesLab/SNPCall_Benchmarking/blob/main/MemoryBenchmarks.png>
+</p>
+
+<br/><br/>
+
 
 # Important Directories
 ## projects/SNP\_Call\_Benchmarking/*Benchmarking\_Run*:
