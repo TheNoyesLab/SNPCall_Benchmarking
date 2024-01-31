@@ -1,5 +1,5 @@
 # SNPCall_Benchmarking
-Repo for scripts and files used in benchmarking variant callers on simulated shotgun metagenomic data.
+Benchmarking variant callers on simulated shotgun metagenomic data. Implementing a bioinformatic pipeline from synthesizing reads to alignment and variant calling.
 
 # Methods & Workflow
 
@@ -10,7 +10,7 @@ Repo for scripts and files used in benchmarking variant callers on simulated sho
 </p>
 
 <p align="center">
-    <b>Figure 1.</b> Workflow diagram showing the variant caller benchmarking process. First, select RefSeq genomes were chosen to simulate a metagenome, random mutations were added to the genomes to create a "gold standard" dataset, then the number of genomes used and number of reads created were adjusted to evaluate the variant callers under a range of sample conditions.
+    <b>Figure 1.</b> Workflow diagram showing the variant caller benchmarking process. First, select RefSeq genomes were chosen to simulate a metagenome and random mutations were added to the genomes to create a "gold standard" dataset. Then the number of genomes used and number of reads created were adjusted to evaluate the variant callers under a range of sample conditions.
 </p>
 
 <br/><br/>
