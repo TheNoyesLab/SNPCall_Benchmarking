@@ -1,2 +1,0 @@
-SimSNP_reads_R1.fastq
-SimSNP_reads_R2.fastq
